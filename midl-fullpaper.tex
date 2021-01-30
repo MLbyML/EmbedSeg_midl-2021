@@ -123,8 +123,7 @@ Here, $\vec{o}_{i}, \vec{e}_{i} \in \mathcal{R}^{D}$.
 In order to do so, we propose to use a gaussian function $\phi_{k}$ for each object $S_{k}$, which converts the distance between a (spatial) pixel embedding $\vec{e}_{i}$ and the instance center $\vec{C}_{k}$ into a probability of belonging to that object:
 
 \begin{equation}
-\phi_{k} \left( \vec{e}_{i} \right) = \exp \left( -\lVert \frac{ \left( \vec{e}_{i} - \vec{C}_{k} \right)^{T} \mathlarger{\mathlarger{\vec{\Sigma}}}_{k}^{-1} \left( \vec{e}_{i} - \vec{C}_{k} \right)}{2} \rVert \right)    
- \label{eqgauss}
+\phi_{k} \left( \vec{e}_{i} \right) = \exp \left( -\lVert \frac{ \left( \vec{e}_{i} - \vec{C}_{k} \right)^{T} \mathlarger{\mathlarger{\vec{\Sigma}}}_{k}^{-1} \left( \vec{e}_{i} - \vec{C}_{k} \right)}{2} \rVert \right)   \label{eqgauss}
 \end{equation}
 
 A high probability means that the pixel embedding $\vec{e}_{i}$ is close to the instance center  $\vec{C}_{k}$ and the corresponding pixel is likely to belong to instance $k$, while a low probability means that the pixel is more likely to belong to the background (or another object). More specifically, if $\phi_{k}(\vec{e}_{i})>0.5,$ than that pixel, at location $\vec{x}_{i}$, will be assigned to object $k$ (and hence, the cluster $S_{k}$). Here, $\mathlarger{\mathlarger{\vec{\Sigma}_{k}}} \in \mathcal{R}^{D \times D}$ is the predicted diagonal matrix representing the cluster bandwidth for object instance $k$. For example, for D = 3, 
@@ -145,7 +144,7 @@ In order to allow larger objects to predict a larger  and similarly, smaller obj
 
 By comparing the predicted $\phi_{k}$ of object $k$ to the ground truth foreground mask $S_{k}$, we compute the differentiable lovasz-hinge loss $L_{\text{iou}}$.
 
-There is still the question of deducing the centre of attraction of an object, at inference time, so as to look for pixel embeddings which fall in a \emph{margin} around it. For this purpose, we also let each pixel predict a \emph{seediness} score which indicates how likely it is to be the centre of attraction. The seediness score should actually be similar to the output of the gaussian function in Equation \eqref{eqgauss2}. So we can construct a loss function $L_{\text{seed}}$ which allows minimizing the distance between the output of the gaussian function corresponding to any pixel and the predicted seediness score, arising from that pixel. The seediness score for the background pixels are regressed to 0.
+There is still the question of deducing the centre of attraction of an object, at inference time, so as to look for pixel embeddings which fall in a \emph{margin} around it. For this purpose, we also let each pixel predict a \emph{seediness} score which indicates how likely it is to be the centre of attraction. The seediness score should actually be similar to the output of the gaussian function in Equation \eqref{eqgauss}. So we can construct a loss function $L_{\text{seed}}$ which allows minimizing the distance between the output of the gaussian function corresponding to any pixel and the predicted seediness score, arising from that pixel. The seediness score for the background pixels are regressed to 0.
 
 \begin{equation}
     L_{\text{seed}}=\frac{1}{N} \sum_{i=1}^{N} 1_{\{i \in S_{k}\}} \lVert s_{i} - \phi_{k} (\vec{e}_{i}) \rVert^{2} +  1_{\{i \in b.g.\}} \lVert s_{i} - 0 \rVert^{2}
