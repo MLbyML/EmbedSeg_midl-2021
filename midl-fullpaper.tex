@@ -1,0 +1,145 @@
+\documentclass{midl} % Include author names
+%\documentclass[anon]{midl} % Anonymized submission
+
+\usepackage{mwe} % to get dummy images
+\jmlrvolume{-- Under Review}
+\jmlryear{2021}
+\jmlrworkshop{Full Paper -- MIDL 2021 submission}
+\editors{Under Review for MIDL 2021}
+
+\title[Embedding-based Instance Segmentation of Microscopy Images]{Embedding-based Instance Segmentation \\of Microscopy Images}
+
+\midlauthor{
+\Name{Manan Lalit \nametag{$^{1,2}$}} \Email{lalit@mpi-cbg.de}
+\AND
+\Name{Pavel Tomancak \nametag{$^{2,3}$}} \Email{tomancak@mpi-cbg.de}
+ \AND
+\Name{Florian Jug \nametag{$^{1,2,4}$}} \Email{jug@mpi-cbg.de} \\
+\addr $^{1}$~Center for Systems Biology Dresden (CSBD)\\
+\addr $^{2}$~Max Planck Institute of Molecular Cell Biology and Genetics\\
+\addr $^{3}$~IT4Innovations, V\v{S}B - Technical University of Ostrava, Ostrava-Poruba, Czech Republic \\
+\addr $^{4}$~Fondazione Human Technopole, Milano, Italy}
+
+% Commands...
+% --------------------
+\newcommand{\EmbedSeg}{\mbox{\textsc{EmbedSeg}}\xspace}
+\newcommand{\miniheadline}[1]{\noindent\textbf{#1.}}
+
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} 
+\def\dof{d.o.f\onedot}
+\def\etal{\emph{et~al}\onedot}
+\makeatother
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Automatic detection and segmentation of objects in microscopy images is important for many biological applications.
+In the domain of natural images, and in particular in the context of city street scenes~\cite{Cordts2016Cityscapes}, embedding-based instance segmentation leads to high-quality results.
+Inspired by this line of work, we introduce \EmbedSeg, an end-to-end trainable deep learning method based on the work by Neven~\etal~\cite{neven2019}. While their approach embeds each pixel to the centroid of any given instance, in \EmbedSeg, motivated by the complex shapes of biological objects, we propose to use the medoid instead.
+Additionally we also make use of a test-time augmentation scheme~\cite{wang2019,stringer2020}, and show that both suggested modifications improve the instance segmentation performance on 2D biological microscopy datasets notably.
+ Next, we extend the network architecture of \EmbedSeg to provide a novel, light weight 3D architecture. 
+ We demonstrate that our 3D approach achieves competitive results in comparison to state-of-the-art methods on diverse and biologically relevant 3D microscopy datasets.
+We also provide two new instance-annotated datasets for use by the community for bench-marking instance segmentation methods.
+Lastly, we show that the overall pipeline has a small enough memory footprint to be used on many CUDA enabled laptop hardware.
+Our open-source implementation is available at \url{github.com/juglab/EmbedSeg}.
+\end{abstract}
+
+\begin{keywords}
+List of keywords, comma separated.
+\end{keywords}
+
+\section{Introduction}
+
+This is where the content of your paper goes.  Some random
+notes\footnote{Random footnote are discouraged}:
+\begin{itemize}
+\item You should use \LaTeX \cite{Lamport:Book:1989}.
+\item JMLR/PMLR uses natbib for references. For simplicity, here, \verb|\cite|  defaults to
+  parenthetical citations, i.e. \verb|\citep|. You can of course also
+  use \verb|\citet| for textual citations.
+\item You should follow the guidelines provided by the conference.
+\item Read through the JMLR template documentation for specific \LaTeX
+  usage questions.
+\item Note that the JMLR template provides many handy functionalities
+such as \verb|\figureref| to refer to a figure,
+e.g. \figureref{fig:example},  \verb|\tableref| to refer to a table,
+e.g. \tableref{tab:example} and \verb|\equationref| to refer to an equation,
+e.g. \equationref{eq:example}.
+\end{itemize}
+
+\begin{table}[htbp]
+ % The first argument is the label.
+ % The caption goes in the second argument, and the table contents
+ % go in the third argument.
+\floatconts
+  {tab:example}%
+  {\caption{An Example Table}}%
+  {\begin{tabular}{ll}
+  \bfseries Dataset & \bfseries Result\\
+  Data1 & 0.12345\\
+  Data2 & 0.67890\\
+  Data3 & 0.54321\\
+  Data4 & 0.09876
+  \end{tabular}}
+\end{table}
+
+\begin{figure}[htbp]
+ % Caption and label go in the first argument and the figure contents
+ % go in the second argument
+\floatconts
+  {fig:example}
+  {\caption{Example Image}}
+  {\includegraphics[width=0.5\linewidth]{example-image}}
+\end{figure}
+
+\begin{algorithm2e}
+\caption{Computing Net Activation}
+\label{alg:net}
+ % older versions of algorithm2e have \dontprintsemicolon instead
+ % of the following:
+ %\DontPrintSemicolon
+ % older versions of algorithm2e have \linesnumbered instead of the
+ % following:
+ %\LinesNumbered
+\KwIn{$x_1, \ldots, x_n, w_1, \ldots, w_n$}
+\KwOut{$y$, the net activation}
+$y\leftarrow 0$\;
+\For{$i\leftarrow 1$ \KwTo $n$}{
+  $y \leftarrow y + w_i*x_i$\;
+}
+\end{algorithm2e}
+
+% Acknowledgments---Will not appear in anonymized version
+\midlacknowledgments{We thank a bunch of people.}
+
+
+\bibliography{midl-samplebibliography}
+
+
+\appendix
+
+\section{Proof of Theorem 1}
+
+This is a boring technical proof of
+\begin{equation}\label{eq:example}
+\cos^2\theta + \sin^2\theta \equiv 1.
+\end{equation}
+
+\section{Proof of Theorem 2}
+
+This is a complete version of a proof sketched in the main text.
+
+\end{document}
