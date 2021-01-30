@@ -1,6 +1,25 @@
 \documentclass{midl} % Include author names
 %\documentclass[anon]{midl} % Anonymized submission
 
+\usepackage{hyperref}
+\usepackage{booktabs} % used for prettier tables
+\usepackage{multirow}
+\usepackage[abs]{overpic}
+\usepackage{xcolor}
+\usepackage{color, colortbl}
+\usepackage{soul}
+% It's fine to compress itemized lists if you used them in the
+% manuscript
+\usepackage{enumitem}
+\usepackage{relsize}
+\usepackage{arydshln}
+\setlist{nosep, leftmargin=14pt}
+\usepackage{mathabx}  % used for down-right arrow in table 2
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{mwe} % to get dummy images
+
+
 \jmlrvolume{-- Under Review}
 \jmlryear{2021}
 \jmlrworkshop{Full Paper -- MIDL 2021 submission}
@@ -40,6 +59,7 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+\input{results}
 \begin{document}
 
 \maketitle
@@ -117,7 +137,7 @@ A high probability means that the pixel embedding $\vec{e}_{i}$ is close to the 
     \end{bmatrix}
 \end{equation}
 
-In order to allow larger objects to predict a larger  and similarly, smaller objects to predict a smaller $\mathlarger{\mathlarger{\vec{\Sigma_{k}}}}$, we let each pixel $\vec{x}_{i}$ of object $k$ predict a $\sigma_{i}$ and compute the corresponding $\sigma_{k}$ for the constituting object as the mean of all predicted $\sigma_{i}$ for that object:
+In order to allow larger objects to predict a larger  and similarly, smaller objects to predict a smaller $\mathlarger{\mathlarger{\vec{\Sigma_{k}}}}$, we let each pixel $\vec{x}_{i}$ of object $k$ individually predict a $\sigma_{i}$ and compute the corresponding $\sigma_{k}$ for the constituting object as the mean of all predicted $\sigma_{i}$ for that object:
 
 \begin{equation}
     \sigma_{k, d} = \frac{1}{\vert S_{k} \vert} \mathlarger{\sum}_{i \in S_{k}} \sigma_{i, d}
@@ -141,10 +161,14 @@ Furthermore, to ensure that at inference while sampling highly seeded pixels, $\
 \end{equation}
 
 The complete loss function is then formulated as a convex sum :
+\begin{equation}
+L = w_{\text{seed}} L_{\text{seed}} + w_{\text{iou}} L_{\text{iou}} + w_{\text{var}} L_{\text{var}}
+\end{equation}
 
-$L = w_{\text{seed}} L_{\text{seed}} + w_{\text{iou}} L_{\text{iou}} + w_{\text{var}} L_{\text{var}}$
-
-
+\section{Experiments and Results}
+\resultsTwoDimensional
+\resultsThreeDimensional
+\threeDimensionalDataDescription
 % \begin{algorithm2e}
 % \caption{Computing Net Activation}
 % \label{alg:net}
