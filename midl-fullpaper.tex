@@ -1,7 +1,6 @@
 \documentclass{midl} % Include author names
 %\documentclass[anon]{midl} % Anonymized submission
 
-\usepackage{mwe} % to get dummy images
 \jmlrvolume{-- Under Review}
 \jmlryear{2021}
 \jmlrworkshop{Full Paper -- MIDL 2021 submission}
@@ -55,7 +54,7 @@ Next, we extend \EmbedSeg for training on volumetric microscopy datasets.
 We demonstrate that our novel 3D extension, as well, achieves competitive results in comparison to state-of-the-art methods on diverse 3D microscopy datasets.
 Furthermore, we also provide two new instance-annotated volumetric datasets for public use in order to bench-mark instance segmentation methods in the future.
 Lastly, we show that the overall pipeline has a small enough memory footprint to be used on many CUDA enabled laptop hardware.
-Our open-source implementation is available at \url{github.com/juglab/EmbedSeg}.
+Our open-source implementation is available at \url{https://github.com/juglab/EmbedSeg}.
 \end{abstract}
 
 \begin{keywords}
@@ -73,13 +72,13 @@ having accurate instance segmentations can aid registration of individual sample
 
 In recent years, Deep Learning (DL) based approaches have proven to be extraordinarily capable of instance segmentation in microscopy data~\cite{moen2019, caicedo2019_v2}.
 Such methods can be further grouped into two fundamental approaches: \textit{Top-down} and \textit{bottom-up} methods. 
-To give an example, Mask R-CNN~\cite{he2017}, the arguably most prominent top-down method, detects object instances via bounding-boxes, then performs an additional refinement step to produce a pixel-mask from multiple bounding-box detections.
+To give an example, Mask R-CNN~\cite{he2017}, arguably the most prominent top-down method, detects object instances via bounding-boxes, then performs an additional refinement step to produce a pixel-mask from multiple bounding-box detections.
 Bottom-up methods, in contrast, are designed such that each pixel makes a prediction of either the object class it belongs to~\cite{ronneberger2015}, and/or the shape of the object instance it is part of~\cite{schmidt2018,neven2019,hirsch2020}. In a second phase, all methods need to consolidate their detections/predictions in order to obtain the final set of object instances.
 Mask R-CNN~\cite{he2017} or Stardist~\cite{schmidt2018}, for example, avoid multiple detections of the same object by employing non-maximum suppression on an instance associated confidence score.
 
-Unlike in natural images, where most objects have either a vertical or horizontal orientation, objects visible in microscopy images are arbitrarily aligned with respect to the image axes. Mask R-CNN, employing axis-aligned bounding boxes, tends to miss detections as a consequence. Stardist, while improving upon this shortcoming, assumes a star-convex prior on the individual object shapes and suffers when the star-convex shape assumption is not fulfilled. 
+Unlike in natural images, where most objects have either a vertical or horizontal orientation, objects visible in microscopy images are arbitrarily aligned with respect to the image axes. Mask R-CNN, employing axis-aligned bounding boxes, therefore tends to miss detections as a consequence. Stardist, while improving upon this shortcoming, assumes a star-convex prior on the individual object shapes and suffers when the star-convex shape assumption is not fulfilled. 
 
-While there are a fair number of DL-based Instance Segmentation Methods for handling 2D microscopy data, methods which directly input volumetric microscopy images are far fewer, and either address the task of  predictions on these volumetric images through a pseudo-3D approach \cite{stringer2020} or suffer from a high GPU memory requirement which makes their usage difficult.
+While there exist a fair number of DL based instance segmentation options for handling 2D microscopy data, methods which directly operate on volumetric microscopy images are fewer, and either address the task of  predictions on these volumetric images through a pseudo-3D approach \cite{stringer2020} or suffer from a high GPU memory requirement which makes their usage difficult.
 
 Here we present \EmbedSeg, a variation of the inspiring work by Neven~\etal~\cite{neven2019}, who propose a very compact model for end-to-end instance segmentation in the natural image domain.
 This method works such that each pixel predicts its \textit{spatial embedding}, \ie another pixel location in the vicinity of the centroid of the object instance that the respective pixel is part of. 
@@ -96,8 +95,54 @@ Furthermore, we also provide two new instance-annotated volumetric datasets for 
 Finally, we provide a memory-efficient open-source implementation of \EmbedSeg and compare its memory footprint to other state-of-the-art methods.
 
 \section{Approach}
+The goal of instance segmentation is to cluster a set of pixels $\vec{X}= \{ \vec{x}_{0} \ldots \vec{x}_{i} \ldots \vec{x}_{N} \}$, (where $\vec{x} \in \mathcal{R}^{D}$; $D = 2$ for two dimensional images and $D = 3$ for volumetric images), into a set of instances $S=\{ {S_{0} \ldots S_{k} \ldots S_{K}} \}$.
+
+This is achieved by learning an offset vector $\vec{o}_{i}$ for each pixel $\vec{x}_{i}$, so that the resulting (spatial) embedding $\vec{e}_{i}=\vec{x}_{i}+\vec{o}_{i}$ points to its corresponding (instance) object center.
+Here, $\vec{o}_{i}, \vec{e}_{i} \in \mathcal{R}^{D}$.
+
+In order to do so, we propose to use a gaussian function $\phi_{k}$ for each object $S_{k}$, which converts the distance between a (spatial) pixel embedding $\vec{e}_{i}$ and the instance center $\vec{C}_{k}$ into a probability of belonging to that object:
+
+\begin{equation}
+\phi_{k} \left( \vec{e}_{i} \right) = \exp \left( -\lVert \frac{ \left( \vec{e}_{i} - \vec{C}_{k} \right)^{T} \mathlarger{\mathlarger{\vec{\Sigma}}}_{k}^{-1} \left( \vec{e}_{i} - \vec{C}_{k} \right)}{2} \rVert \right)    
+ \label{eqgauss}
+\end{equation}
+
+A high probability means that the pixel embedding $\vec{e}_{i}$ is close to the instance center  $\vec{C}_{k}$ and the corresponding pixel is likely to belong to instance $k$, while a low probability means that the pixel is more likely to belong to the background (or another object). More specifically, if $\phi_{k}(\vec{e}_{i})>0.5,$ than that pixel, at location $\vec{x}_{i}$, will be assigned to object $k$ (and hence, the cluster $S_{k}$). Here, $\mathlarger{\mathlarger{\vec{\Sigma}_{k}}} \in \mathcal{R}^{D \times D}$ is the predicted diagonal matrix representing the cluster bandwidth for object instance $k$. For example, for D = 3, 
+
+\begin{equation}
+    \vec{\Sigma}_{k} = \begin{bmatrix}
+    \sigma^{2}_{k, 1} & 0 & 0 \\
+    0 & \sigma^{2}_{k, 2} & 0 \\
+    0 & 0 & \sigma^{2}_{k, 3}
+    \end{bmatrix}
+\end{equation}
+
+In order to allow larger objects to predict a larger  and similarly, smaller objects to predict a smaller $\mathlarger{\mathlarger{\vec{\Sigma_{k}}}}$, we let each pixel $\vec{x}_{i}$ of object $k$ predict a $\sigma_{i}$ and compute the corresponding $\sigma_{k}$ for the constituting object as the mean of all predicted $\sigma_{i}$ for that object:
+
+\begin{equation}
+    \sigma_{k, d} = \frac{1}{\vert S_{k} \vert} \mathlarger{\sum}_{i \in S_{k}} \sigma_{i, d}
+\end{equation}
+
+By comparing the predicted $\phi_{k}$ of object $k$ to the ground truth foreground mask $S_{k}$, we compute the differentiable lovasz-hinge loss $L_{\text{iou}}$.
+
+There is still the question of deducing the centre of attraction of an object, at inference time, so as to look for pixel embeddings which fall in a \emph{margin} around it. For this purpose, we also let each pixel predict a \emph{seediness} score which indicates how likely it is to be the centre of attraction. The seediness score should actually be similar to the output of the gaussian function in Equation \eqref{eqgauss2}. So we can construct a loss function $L_{\text{seed}}$ which allows minimizing the distance between the output of the gaussian function corresponding to any pixel and the predicted seediness score, arising from that pixel. The seediness score for the background pixels are regressed to 0.
+
+\begin{equation}
+    L_{\text{seed}}=\frac{1}{N} \sum_{i=1}^{N} 1_{\{i \in S_{k}\}} \lVert s_{i} - \phi_{k} (\vec{e}_{i}) \rVert^{2} +  1_{\{i \in b.g.\}} \lVert s_{i} - 0 \rVert^{2}
+    \label{eqseed}
+\end{equation}
+
+Furthermore, to ensure that at inference while sampling highly seeded pixels, $\vec{\sigma}_{k} \approx \hat{\vec{\sigma}}_{k}$, we include a smoothness loss:
 
 
+\begin{equation}
+    L_{\text{var}}= \frac{1}{\vert S_{k} \vert}\sum_{i \in S_{k}} \lVert \vec{\sigma}_{i} - \vec{\sigma}_{k} \rVert^{2}
+    \label{eqvar}
+\end{equation}
+
+The complete loss function is then formulated as a convex sum :
+
+$L = w_{\text{seed}} L_{\text{seed}} + w_{\text{iou}} L_{\text{iou}} + w_{\text{var}} L_{\text{var}}$
 
 
 % \begin{algorithm2e}
@@ -120,7 +165,7 @@ Finally, we provide a memory-efficient open-source implementation of \EmbedSeg a
 % Acknowledgments---Will not appear in anonymized version
 \midlacknowledgments{
 The authors would like to thank Matthias Arzt from CSBD/MPI-CBG for helpful discussions on the presented method and the Scientific Computing Facility at MPI-CBG. 
-The authors would also like to express their gratitude to Frederike Alwes, Ko Sugawara and Michalis Averof from IGFL, France, for providing the Pahryale 3D dataset.
+The authors would also like to express their gratitude to Frederike Alwes, Ko Sugawara and Michalis Averof from IGFL, France, for providing the Parhyale 3D dataset.
 This work was supported by the German Federal Ministry of Research and Education (BMBF) under the codes 031L0102 (de.NBI) and 01IS18026C (ScaDS2), and the German Research Foundation (DFG) under the code JU3110/1-1(FiSS) and TO563/8-1 (FiSS).
 P.T. was supported by the European Regional Development Fund in the IT4Innovations national supercomputing center - path to exascale project, project number CZ.02.1.01/0.0/0.0/16\_013/0001791 within the Operational Programme Research, Development and Education.
 }
