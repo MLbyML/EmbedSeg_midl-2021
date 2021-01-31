@@ -105,24 +105,22 @@ Note that the Cellpose results are either trained by us on exclusively the given
     $\text{AP}_{0.10}$ & $\text{AP}_{0.25}$ & $\text{AP}_{0.30}$ & $\text{AP}_{0.40}$ & $\text{AP}_{0.50}$ & $\text{AP}_{0.60}$ & $\text{AP}_{0.70}$ & $\text{AP}_{0.80}$ & $\text{AP}_{0.90}$ \\ \midrule
     %
     \multicolumn{11}{c}{\textit{Organoid-2020}} \\ \midrule
-    \multicolumn{1}{l}{Cellpose} &  & 
-     &   &  &  &  &  &  &  &  \\
-     \multicolumn{1}{l}{StarDist-3D} & 20     &0.988 &	0.982 & 	0.982 & 	0.982 & 	0.973 & 	0.970 & 	0.958 & 	0.774 & 	0.052 \\
+    \multicolumn{1}{l}{Cellpose} & 3.6  & 0.217 & 0.214 & 0.212 & 0.210 & 0.203& 0.197& 0.183 & 0.146 &0.042\\
+     \multicolumn{1}{l}{StarDist-3D} & 20     & \underline{0.988} &	\underline{0.982} & 	\underline{0.982} & 	\textbf{0.982} & 	\underline{0.973} & 	\underline{0.970} & 	\underline{0.958} & 	\underline{0.774} & 	\underline{0.052} \\
     %  \rowcolor{Gray}
-    \multicolumn{1}{l}{Ours} & 7  & 0.990 & 0.984 &  0.984 & 0.980 & 0.975 & 0.975 & 0.973 & 0.970 & 0.928 \\ \midrule
-    %
-    \multicolumn{11}{c}{\textit{Platynereis-2020}} \\ \midrule
-    \multicolumn{1}{l}{Cellpose} &  & 0.971 & 	0.972 &	0.966 & 	0.957 & 	0.931 & 	0.872 & 	0.700 &	0.299 & 	0.009\\
-     \multicolumn{1}{l}{StarDist-3D} &      &
-      & & & & &  & & & \\
+    \multicolumn{1}{l}{Ours} & 7  & \textbf{0.990} & \textbf{0.984} &  \textbf{0.984} & \underline{0.980} & \textbf{0.975} & \textbf{0.975} & \textbf{0.973} & \textbf{0.970} & \textbf{0.928} \\ \midrule
+   %
+   \multicolumn{11}{c}{\textit{Platynereis-2020}} \\ \midrule
+    \multicolumn{1}{l}{Cellpose} & 3.6 & \underline{0.971} & 	\textbf{0.971} &	\underline{0.966} & 	0.957 & 	0.931 & 	0.872 & 	0.700 &	\underline{0.299} & 	\textbf{0.009}\\
+     \multicolumn{1}{l}{StarDist-3D} & 20     & \textbf{0.973} & \underline{0.969} &0.966 & \underline{0.966} & \underline{0.937} & \textbf{0.910} & \textbf{0.736} & 0.246 & 0.002\\
     %  \rowcolor{Gray}
-    \multicolumn{1}{l}{Ours} &   & 0.969 & 0.969 &  0.968 & 0.962& 0.947 &   0.889 & 0.735 & 0.333 & 0.007\\ \midrule
+    \multicolumn{1}{l}{Ours} &  7 & 0.969 & \underline{0.969} &  \textbf{0.968} & \underline{0.962} & \textbf{0.947} &   \underline{0.889} & \underline{0.735} & \textbf{0.333} & \underline{0.007}\\ \midrule
     \multicolumn{11}{c}{\textit{Parhyale-2016}} \\ \midrule
-    \multicolumn{1}{l}{Cellpose} &  & 0.545 &  	0.498 & 0.456 & 0.384 & 0.285 & 0.154 & 0.040 & 0.006 &  0.000 \\
+    \multicolumn{1}{l}{Cellpose} & 3.6 & 0.545 &  	0.498 & 0.456 & 0.384 & 0.285 & 0.154 & 0.040 & 0.006 &  0.000 \\
     \multicolumn{1}{l}{U-Net} &  & 0.547 & 0.501 & 0.423 &   0.330 &  0.247 &  0.171 &  0.091 &  0.021 &   0.000 \\
-     \multicolumn{1}{l}{StarDist-3D} &      & \textbf{0.766} &   \textbf{0.757} &  \textbf{0.741} &  \textbf{0.698} &  \textbf{0.593} &  \textbf{0.443} &  \textbf{0.224} &  \underline{0.038} & 0.000 \\
+     \multicolumn{1}{l}{StarDist-3D} & 20     & \textbf{0.766} &   \textbf{0.757} &  \textbf{0.741} &  \textbf{0.698} &  \textbf{0.593} &  \textbf{0.443} &  \textbf{0.224} &  \underline{0.038} & 0.000 \\
     %  \rowcolor{Gray}
-    \multicolumn{1}{l}{Ours} &   & \underline{0.701} &	\underline{0.689} 	& \underline{0.678} & 	\underline{0.612} & 	\underline{0.509} & 	\underline{0.371} &	\underline{0.191} & 	\textbf{0.043} &	0.000        \\ 
+    \multicolumn{1}{l}{Ours} & 7  & \underline{0.701} &	\underline{0.689} 	& \underline{0.678} & 	\underline{0.612} & 	\underline{0.509} & 	\underline{0.371} &	\underline{0.191} & 	\textbf{0.043} &	0.000        \\ 
     \bottomrule
 \end{tabular}
 \end{table*}
